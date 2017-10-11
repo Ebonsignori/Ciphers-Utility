@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import javafx.application.Application;
-import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -38,8 +39,10 @@ public class CiphersUtility extends Application {
             "Single Shift Cipher",
             "Double Shift Cipher"
         );
+        cipherSelection.setValue("Single Shift Cipher");
         cipherselectionHBox.getChildren().addAll(cipherSelectLabel, cipherSelection);
         cipherselectionHBox.setSpacing(10);
+        cipherselectionHBox.setPadding(new Insets(7, 7, 7, 7));
         cipherselectionHBox.setAlignment(Pos.CENTER);
         
         // Decrypt and Encrypt Tabs in center of page
@@ -56,128 +59,324 @@ public class CiphersUtility extends Application {
         System.setErr(ps);
         logConsole.setEditable(false);
         logConsole.setText("Enter values and press button to begin \n");   
-        logConsole.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 12px;");
-        logConsole.setPrefHeight(115);
-        logConsole.setPrefWidth(40);      
-        
+        logConsole.setStyle("-fx-highlight-fill: lightgray; -fx-highlight-text-fill: firebrick; -fx-font-size: 16px;");    
+        logConsole.setPrefHeight(150);
         /* Encrypt ShiftOne Tab */
         encryptTab.setText("Encrypt");
         
-        // Plaintext field with validation
+        // Encryption Plaintext field 
         Label plaintextLabel = new Label("Plaintext:");
         TextField plaintextField = new TextField ();
         HBox plaintextHBox = new HBox();
         plaintextHBox.getChildren().addAll(plaintextLabel, plaintextField);
         plaintextHBox.setSpacing(10);
         
-        plaintextField.focusedProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              if (!newValue) {
-                if (!plaintextField.getText().matches("[a-zA-Z]+")) {
-                    plaintextField.setText("");
-                    logConsole.setText("Please only enter letters a-z (case insensitive)");
-                }
-              }
-            }
-          );
-        
-        // Key field with validation
+        // Encryption Key field 
         Label keyLabel = new Label("Key:");
         TextField keyField = new TextField ();
         HBox keyHBox = new HBox();
         keyHBox.getChildren().addAll(keyLabel, keyField);
-        keyHBox.setSpacing(10);
+        keyHBox.setSpacing(42);
+        // Visability is toggled based on cipher type
+        keyHBox.managedProperty().bind(keyHBox.visibleProperty());
+        
+        // Double Encryption Key1 field 
+        Label key1Label = new Label("Key1: ");
+        TextField key1Field = new TextField ();
+        HBox key1HBox = new HBox();
+        key1HBox.getChildren().addAll(key1Label, key1Field);
+        key1HBox.setSpacing(30);
+        // Visability is toggled based on cipher type. Invisible by default
+        key1HBox.managedProperty().bind(key1HBox.visibleProperty());
+        key1HBox.setVisible(false);
+        
+        // Double Encryption Key2 field 
+        Label key2Label = new Label("Key2: ");
+        TextField key2Field = new TextField ();
+        HBox key2HBox = new HBox();
+        key2HBox.getChildren().addAll(key2Label, key2Field);
+        key2HBox.setSpacing(30);
+        // Visability is toggled based on cipher type. Invisible by default
+        key2HBox.managedProperty().bind(key2HBox.visibleProperty());
+        key2HBox.setVisible(false);
        
-        // Encrypt button to begin encryption process 
+        // Encryption button to begin encryption process 
         Button encryptShiftOne = new Button();
-        encryptShiftOne.setText("Begin Encryption.");
+        encryptShiftOne.setText("Begin Single Encryption.");
+        encryptShiftOne.managedProperty().bind(encryptShiftOne.visibleProperty());
         encryptShiftOne.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 if (plaintextField.getText() != null && keyField.getText() != null) {
-                    logConsole.setText("Encrypting... \n");
-                    int key = Integer.parseInt(keyField.getText()); 
-                    String plaintext = (String)plaintextField.getText();
-                    Ciphers cipher = new ShiftOne("", plaintext, key);
-                    cipher.encrypt();
+                     // Check for valid text and key input before decrypting 
+                     try {
+                        logConsole.setText(""); // Clear console
+                        // If invalid text set textfield to empty
+                        if (!plaintextField.getText().matches("[a-zA-Z]+")) {
+                           plaintextField.setText("");
+                           logConsole.appendText("Please only enter letters a-z (case insensitive) \n");
+                        }
+                        // Get key and plaintext. If key isn't an integer, raise error. 
+                        int key = Integer.parseInt(keyField.getText()); 
+                        String plaintext = (String)plaintextField.getText();
+                        
+                        if (key < 25 && key > -25 && !plaintextField.getText().equals("")){
+                            logConsole.appendText("Encrypting... \n");
+                            ShiftOne cipher = new ShiftOne(plaintext, "", key);
+                            cipher.encrypt();
+                            printResults(Integer.toString(key), cipher.getCiphertext(), plaintext);    
+                        // If key not in range, set key field to empty
+                        } else if (key > 25 && key < -25) {
+                            keyField.setText("");
+                            logConsole.appendText("Key must be an integer between -25 through 25");
+                        }
+                    } catch (Exception e){
+                        keyField.setText("");
+                        logConsole.appendText("Please enter an integer for your key.");
+                    }            
                 }
             }
         });
         
-        // Populate Encrypt Shift One tab with contents
-        VBox encryptShiftOneVBox = new VBox();
-        encryptShiftOneVBox.getChildren().addAll(plaintextHBox, keyHBox, encryptShiftOne);
-        encryptTab.setContent(encryptShiftOneVBox);
+        // Encryption button to begin double encryption process 
+        Button encryptShiftTwo = new Button();
+        encryptShiftTwo.setText("Begin Double Encryption.");
+        encryptShiftTwo.managedProperty().bind(encryptShiftTwo.visibleProperty());
+        encryptShiftTwo.setVisible(false);
+        encryptShiftTwo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (plaintextField.getText() != null && key1Field.getText() != null && key2Field.getText() != null) {
+                     // Check for valid text and key input before decrypting 
+                     try {
+                        logConsole.setText(""); // Clear console
+                        // If invalid text set textfield to empty
+                        if (!plaintextField.getText().matches("[a-zA-Z]+")) {
+                           plaintextField.setText("");
+                           logConsole.appendText("Please only enter letters a-z (case insensitive) \n");
+                        }
+                        // Get key and plaintext. If key isn't an integer, raise error. 
+                        int key1 = Integer.parseInt(key1Field.getText()); 
+                        int key2 = Integer.parseInt(key2Field.getText()); 
+                        String plaintext = (String)plaintextField.getText();
+                        
+                        if (key1 < 25 && key1 > -25 && key2 < 25 && key2 > -25 && !plaintextField.getText().equals("")) {
+                            logConsole.appendText("Double Encrypting... \n");
+                            ShiftTwo cipher = new ShiftTwo(plaintext, "", key1, key2);
+                            cipher.encrypt();
+                            printResults(Integer.toString(key1), Integer.toString(key2), cipher.getCiphertext(), plaintext);    
+                        // If key not in range, set key field to empty
+                        } else if (key1 < 25 && key1 > -25 && key2 < 25 && key2 > -25) {
+                            keyField.setText("");
+                            logConsole.appendText("Key(s) must be an integer between -25 through 25");
+                        }
+                    } catch (Exception e){
+                        keyField.setText("");
+                        logConsole.appendText("Please enter an integer for your key(s).");
+                    }            
+                }
+            }
+        });
+        
+        // Populate Encrypt Shift tab with contents
+        VBox encryptShiftVBox = new VBox(10);
+        encryptShiftVBox.getChildren().addAll(plaintextHBox, keyHBox, key1HBox, key2HBox, encryptShiftOne, encryptShiftTwo);
+        encryptShiftVBox.setPadding(new Insets(15, 15, 0, 15));
+        encryptTab.setContent(encryptShiftVBox);
         tabPane.getTabs().add(encryptTab);
+        tabPane.setPrefHeight(300);
+        
         
         /* Decrypt ShiftOne Tab */
         decryptTab.setText("Decrypt");
         
-        // Plaintext field with validation
-        Label plaintextLabelD = new Label("Plaintext:");
-        TextField plaintextFieldD = new TextField ();
+        // Decryption plaintext field
+        Label ciphertextLabelD = new Label("Ciphertext:");
+        TextField ciphertextField = new TextField ();
         HBox plaintextHBoxD = new HBox();
-        plaintextHBoxD.getChildren().addAll(plaintextLabelD, plaintextFieldD);
+        plaintextHBoxD.getChildren().addAll(ciphertextLabelD, ciphertextField);
         plaintextHBoxD.setSpacing(10);
         
-        plaintextFieldD.focusedProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              if (!newValue) {
-                if (!plaintextField.getText().matches("[a-zA-Z]+")) {
-                    plaintextField.setText("");
-                    logConsole.setText("Please only enter letters a-z (case insensitive) \n");
-                }
-              }
-            }
-        );
-        
-        // Key field with validation
+        // Decryption Key field 
         Label keyLabelD = new Label("Key:");
         TextField keyFieldD = new TextField ();
         HBox keyHBoxD = new HBox();
         keyHBoxD.getChildren().addAll(keyLabelD, keyFieldD);
-        keyHBoxD.setSpacing(10);
-       
-        // Encrypt button to begin encryption process 
+        keyHBoxD.setSpacing(42);
+        keyHBoxD.managedProperty().bind(keyHBoxD.visibleProperty());
+        
+        // Double Decryption Key1 field 
+        Label key1LabelD = new Label("Key1: ");
+        TextField key1FieldD = new TextField ();
+        HBox key1HBoxD = new HBox();
+        key1HBoxD.getChildren().addAll(key1LabelD, key1FieldD);
+        key1HBoxD.setSpacing(30);
+        // Visability is toggled based on cipher type. Invisible by default
+        key1HBoxD.managedProperty().bind(key1HBoxD.visibleProperty());
+        key1HBoxD.setVisible(false);
+        
+        // Double Decryption Key2 field 
+        Label key2LabelD = new Label("Key2: ");
+        TextField key2FieldD = new TextField ();
+        HBox key2HBoxD = new HBox();
+        key2HBoxD.setSpacing(40);
+        key2HBoxD.getChildren().addAll(key2LabelD, key2FieldD);
+        key2HBoxD.setSpacing(30);
+        // Visability is toggled based on cipher type. Invisible by default
+        key2HBoxD.managedProperty().bind(key2HBoxD.visibleProperty());
+        key2HBoxD.setVisible(false);
+
+        
+        // Decryption button to begin Decryption process 
         Button decryptShiftOne = new Button();
-        decryptShiftOne.setText("Begin Decryption.");
+        decryptShiftOne.setText("Begin Single Decryption.");
+        decryptShiftOne.managedProperty().bind(decryptShiftOne.visibleProperty());
         decryptShiftOne.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (plaintextFieldD.getText() != null && keyFieldD.getText() != null) {
-                    logConsole.setText("Decrypting... \n");
-                    int key = Integer.parseInt(keyField.getText()); 
-                    String plaintext = (String)plaintextFieldD.getText();
-                    Ciphers cipher = new ShiftOne("", plaintext, key);
-                    cipher.decrypt();
+                if (ciphertextField.getText() != null && keyFieldD.getText() != null) {
+                     // Check for valid text and key input before decrypting 
+                     try {
+                         logConsole.setText(""); // Clear Console
+                        // If invalid text set textfield to empty
+                        if (!ciphertextField.getText().matches("[a-zA-Z]+")) {
+                           ciphertextField.setText("");
+                           logConsole.appendText("Please only enter letters a-z (case insensitive) \n");
+                        }
+                        // If not integer raise error
+                        int key = Integer.parseInt(keyFieldD.getText()); 
+                        
+                        if (key < 25 && key > -25 && !ciphertextField.getText().equals("")){
+                            logConsole.appendText("Decrypting... \n");
+                            String ciphertext = (String)ciphertextField.getText();
+                            ShiftOne cipher = new ShiftOne("", ciphertext, key);
+                            cipher.decryptManual();
+                            printResults(Integer.toString(key), ciphertext, cipher.getPlaintext());    
+                        // If key not in range, set key field to empty
+                        } else if (key > 25 && key < -25) {
+                            keyFieldD.setText("");
+                            logConsole.appendText("Key must be an integer between -25 through 25");
+                        }
+                    } catch (Exception e){
+                        keyFieldD.setText("");
+                        logConsole.appendText("Please enter an integer for your key.");
+                    }            
                 }
             }
         });
         
-        // Populate Encrypt Shift One tab with contents
-        VBox decryptShiftOneVBox = new VBox();
-        decryptShiftOneVBox.getChildren().addAll(plaintextHBoxD, keyHBoxD, decryptShiftOne);
-        decryptTab.setContent(decryptShiftOneVBox);
+        // Decryption button to begin double decryption process 
+        Button decryptShiftTwo = new Button();
+        decryptShiftTwo.setText("Begin Double Decryption.");
+        decryptShiftTwo.managedProperty().bind(decryptShiftTwo.visibleProperty());
+        decryptShiftTwo.setVisible(false);
+        decryptShiftTwo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (ciphertextField.getText() != null && key1FieldD.getText() != null && key2FieldD.getText() != null) {
+                     // Check for valid text and key(s) input before decrypting 
+                     try {
+                        logConsole.setText(""); // Clear console
+                        // If invalid text set textfield to empty
+                        if (!ciphertextField.getText().matches("[a-zA-Z]+")) {
+                           ciphertextField.setText("");
+                           logConsole.appendText("Please only enter letters a-z (case insensitive) \n");
+                        }
+                        // Get key and plaintext. If key isn't an integer, raise error. 
+                        int key1 = Integer.parseInt(key1FieldD.getText()); 
+                        int key2 = Integer.parseInt(key2FieldD.getText()); 
+                        String ciphertext = (String)ciphertextField.getText();
+                        
+                        if (key1 < 25 && key1 > -25 && key2 < 25 && key2 > -25 && !ciphertext.equals("")){
+                            logConsole.appendText("Double Decrypting... \n");
+                            ShiftTwo cipher = new ShiftTwo("", ciphertext, key1, key2);
+                            cipher.decryptManual();
+                            printResults(Integer.toString(key1), Integer.toString(key2), ciphertext, cipher.getPlaintext());    
+                        // If key not in range, set key field to empty
+                        } else if (key1 > 25 && key1 < -25 && key2 < 25 && key2 > -25) {
+                            keyField.setText("");
+                            logConsole.appendText("Keys must be an integer between -25 through 25");
+                        }
+                    } catch (Exception e){
+                        keyField.setText("");
+                        logConsole.appendText("Please enter an integer for your keys.");
+                    }            
+                }
+            }
+        });
+        
+        // Populate Decrypt Shift tab with contents
+        VBox decryptShiftVBox = new VBox(10);
+        decryptShiftVBox.getChildren().addAll(plaintextHBoxD, keyHBoxD, key1HBoxD, key2HBoxD, decryptShiftOne, decryptShiftTwo);
+        decryptShiftVBox.setPadding(new Insets(15, 15, 0, 15));
+        decryptTab.setContent(decryptShiftVBox);
         tabPane.getTabs().add(decryptTab);
+        
+        // Detect cipher type selection and adjust options appropriately
+        cipherSelection.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> 
+                    {
+                        // Toggle Key and Button Visabilities
+                        if (((String)newValue).equals("Double Shift Cipher")) {
+                            // Toggle Keys
+                            keyHBox.setVisible(false);
+                            keyHBoxD.setVisible(false);
+                            key1HBox.setVisible(true);
+                            key2HBox.setVisible(true);
+                            key1HBoxD.setVisible(true);
+                            key2HBoxD.setVisible(true);
+                            
+                            // Toggle Buttons
+                            encryptShiftOne.setVisible(false);
+                            encryptShiftTwo.setVisible(true);
+                            decryptShiftOne.setVisible(false);
+                            decryptShiftTwo.setVisible(true);
+                            
+                        } else if (((String)newValue).equals("Single Shift Cipher")) {
+                            // Toggle Keys
+                            keyHBox.setVisible(true);
+                            keyHBoxD.setVisible(true);                       
+                            key1HBox.setVisible(false);
+                            key2HBox.setVisible(false);
+                            key1HBoxD.setVisible(false);
+                            key2HBoxD.setVisible(false);
+                            // Toggle Buttons
+                            encryptShiftOne.setVisible(true);
+                            encryptShiftTwo.setVisible(false);
+                            decryptShiftOne.setVisible(true);
+                            decryptShiftTwo.setVisible(false);
+                        }
+                    }
+        );
 
         
         BorderPane root = new BorderPane();
         root.setTop(cipherselectionHBox);
         root.setCenter(tabPane);
         root.setBottom(logConsole);
-        
-        Scene scene = new Scene(root, 400, 300);
+        // Make tabs fill width
+        tabPane.tabMinWidthProperty().bind(root.widthProperty().divide(tabPane.getTabs().size()).subtract(25));
+        Scene scene = new Scene(root, 400, 430);
         
         primaryStage.setTitle("Basic Cipher Utility");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         launch(args);
+    }
+    
+    public static void printResults(String key, String ciphertext, String plaintext) {
+        System.out.println("Key: " + key);
+        System.out.println("Ciphertext: " + ciphertext);
+        System.out.println("Plaintext: " + plaintext );
+    }
+    
+    public static void printResults(String key1, String key2, String ciphertext, String plaintext) {
+        System.out.println("Key #1: " + key1);
+        System.out.println("Key #2: " + key2);
+        System.out.println("Ciphertext: " + ciphertext);
+        System.out.println("Plaintext: " + plaintext );
     }
     
     public static class Console extends OutputStream {
