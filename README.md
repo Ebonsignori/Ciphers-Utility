@@ -1,7 +1,9 @@
 # Basic Ciphers Utility
 An application with a GUI interface that can encrypt plaintext or decrypt ciphertext using basic ciphers.
 
-Inputs for the program change based on the ciphers used, but each cipher supports the option for both manual or automatic decrytion. Automatic decrpytion requires English sentences.  
+![Alt text](./documentation/GUI_v.9.PNG?raw=true "Optional Title")
+	
+Inputs for the program change based on the ciphers used, but each cipher supports the option for both manual or automatic decrytion. Automatic decrpytion *(coming soon)* requires English sentences.  
 
 ## Ciphers supported in current version:
 * Shift (Caesar) Cipher
@@ -20,6 +22,8 @@ Takes a key 'n' and shifts the alphabet by n, then performs a simple substitutio
 **Automatic Decrpytion:** Keys are iterated through using a brute force approach until English word matches are found. Possibilities are returned for each matching letter in the decrypted plaintext. 
 
 ## Double Shift Cipher
+![Alt text](./documentation/double_shift_cipher_diagram.PNG?raw=true "Optional Title")
+
 Takes two keys 'n1' and 'n2' and shifts the alphabet by n1, then performs a simple substitution using the first shifted alphabet. Next the the shifted alphabet is shifted again, but by n2, then a simple substitution is performed using the second shifted alphabet.
 
 * Key(s): n1, n2 
