@@ -21,7 +21,7 @@ public class ShiftCiphers {
     protected ShiftCiphers(String plaintext, String ciphertext) {
         this.plaintext = plaintext;
         this.ciphertext = ciphertext;
-        this.initDict(); // Initalize the frequent word dictionary
+        this.initDict(); // Initialize frequent words dictionary
     }
     
     protected String getPlaintext() {
@@ -31,30 +31,25 @@ public class ShiftCiphers {
     protected String getCiphertext() {
         return ciphertext.toUpperCase();
     }
-    
-    /* Prints 'x' number of possibly decryptions of the ciphertext */
-    protected void printXPossibleMatches(int x) {
-        System.out.println("--- Possible plaintext(s): --- ");
-        // Remove duplicates from possibilites 
-        Set<Occurance> possibilitesSet = new HashSet<>();
-        for (int i = 0; i < plaintextPossibilities.size(); i++) {
-            possibilitesSet.add(plaintextPossibilities.get(i));
-        } 
-        // Add duplicates removed to new list and sort it
-        List<Occurance> possibilitesList = new ArrayList<>();
-        possibilitesList.addAll(possibilitesSet);
-        Collections.sort(possibilitesList);
-        
-        // Print x number of possible plaintexts
-        for (int i = 0; i < possibilitesList.size(); i++) {
-           if (i < 5) {
-               Occurance occ = possibilitesList.get(i);
-               System.out.println("#" + Integer.toString(i+1) + ": " +
-                                  occ.toString() + ", key = " + occ.getKeyStr());
-           }
-        } 
-        System.out.println("-------------------------------");
-    }  
+
+    /* Initialize dictionary of 10000 most common English words */
+    private void initDict() {
+        // Words are line by line in file "google-10000-english.java"
+        File file = new File("./common_words/google-10000-english.java");
+        this.commonEnglishDict = new String[10000];
+        try {
+            Scanner in = new Scanner(file);
+            int i = 0;
+            while (in.hasNextLine()) {
+                  String line = in.nextLine();
+                  commonEnglishDict[i] = (String)line;
+                  i++;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.out.print("Error: English dictionary not found.");
+        }
+    }
     
     /* Returns true if passed word is in 10000 most frequent word dictionary */
     protected boolean isFrequent(String word) {
@@ -66,7 +61,7 @@ public class ShiftCiphers {
         return false;
     }
     
-    /* Generate each subset of string and count occurances of subsets in common english word dictionary */
+    /* Generate each subset of string and count occurrences of subsets in common English word dictionary */
     protected int countMatches(String word) {
         int occurances = 0;
         String subWord;
@@ -88,27 +83,35 @@ public class ShiftCiphers {
         return occurances;
     }
     
-    /* Initialize dictionary of 10000 most common english words */
-    private void initDict() {
-        // Words are line by line in file "google-10000-english.java"
-        File file = new File("./common_words/google-10000-english.java");
-        this.commonEnglishDict = new String[10000];
-        try {
-            Scanner in = new Scanner(file);
-            int i = 0;
-            while (in.hasNextLine()) {
-                  String line = in.nextLine();
-                  commonEnglishDict[i] = (String)line;
-                  i++;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            System.out.print("Error: English dictionary not found.");
-        }
-    }
+    /* Prints 'x' number of possible decryptions of ciphertext */
+    protected void printXPossibleMatches(int x) {
+        System.out.println("--- Possible plaintext(s): --- ");
+        // Remove duplicates from possibilities 
+        Set<Occurance> possibilitesSet = new HashSet<>();
+        for (int i = 0; i < plaintextPossibilities.size(); i++) {
+            possibilitesSet.add(plaintextPossibilities.get(i));
+        } 
+        // Add duplicates removed to new list and sort it
+        List<Occurance> possibilitesList = new ArrayList<>();
+        possibilitesList.addAll(possibilitesSet);
+        Collections.sort(possibilitesList);
+        
+        // Print x number of possible plaintexts
+        for (int i = 0; i < possibilitesList.size(); i++) {
+           if (i < 5) {
+               Occurance occ = possibilitesList.get(i);
+               System.out.println("#" + Integer.toString(i+1) + ": " +
+                                  occ.toString() + ", key = " + occ.getKeyStr());
+           }
+        } 
+        System.out.println("-------------------------------");
+    }  
 }
 
-
+/* 
+* Class for representing a plaintext, the key used to decrypt it and the number
+* of times it occurred in the common English word dictionary
+*/ 
 class Occurance implements Comparable<Occurance> {
     String plaintext;
     int occurance;
@@ -119,7 +122,7 @@ class Occurance implements Comparable<Occurance> {
         this.occurance = occurance;
         this.key = key;
     }
-
+    // For the sort method used to rank likely plaintexts on occurrences
     @Override
     public int compareTo(Occurance o) {
         return occurance > o.occurance ? -1 : occurance < o.occurance ? 1 : 0;
@@ -137,7 +140,7 @@ class Occurance implements Comparable<Occurance> {
 
 
 
-/* Single alphabetic shifit and substitution */
+/* Single alphabetic shift and substitution */
 class ShiftOne extends ShiftCiphers {
     int key;
 
@@ -176,7 +179,7 @@ class ShiftOne extends ShiftCiphers {
         }
     }
     
-     /* Decrypt with given key */
+     /* Decrypt with given key and return decrypted text */
     public String decryptHelper(int key) {
         Alphabet cipherbetTmp = new Alphabet(); 
         String plaintextTmp = "";
@@ -192,6 +195,7 @@ class ShiftOne extends ShiftCiphers {
        
     /* Brute force automatic decryption using English word matching on plaintext */
     public void decryptAutomatic(int x) {
+        // x is the number of possibilities to be printed. -1 means print all
         if (x == -1) { System.out.println("--- All 26 Decrypted Possibilities: ---"); }
         for (int n = 0; n < 26; n++) {
             String decrypted = this.decryptHelper(n);
@@ -210,7 +214,7 @@ class ShiftOne extends ShiftCiphers {
     
 }
 
-/* Double alphabetic shifit and substitution */
+/* Double alphabetic shift and substitution */
 class ShiftTwo extends ShiftCiphers {
     int key1;
     int key2;
@@ -271,7 +275,7 @@ class ShiftTwo extends ShiftCiphers {
         }
     } 
 
-    /* Decrypt with given key */
+    /* Decrypt with given keys and return decrypted text */
     public String decryptHelper(int key1, int key2) {
         Alphabet cipherbetTmp = new Alphabet(); 
         String intermediatePlainTmp = "";
@@ -298,6 +302,7 @@ class ShiftTwo extends ShiftCiphers {
     
     /* Brute force automatic decryption using English word matching on plaintext */
     public void decryptAutomatic(int x) {
+        // X is the number of possibilities to be printed. -1 means print all
         if (x == -1) { System.out.println("--- All 676 Decrypted Possibilities: ---"); }
         for (int n1 = 0; n1 < 26; n1++) {
             for (int n2 = 0; n2 < 26; n2++) {

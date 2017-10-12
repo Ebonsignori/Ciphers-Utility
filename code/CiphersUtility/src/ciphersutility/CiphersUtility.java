@@ -71,32 +71,32 @@ public class CiphersUtility extends Application {
         plaintextHBox.getChildren().addAll(plaintextLabel, plaintextField);
         plaintextHBox.setSpacing(16);
 
-        // Encryption Key field 
+        // Encryption field for key
         Label keyLabel = new Label("Key:");
         TextField keyField = new TextField();
         HBox keyHBox = new HBox();
         keyHBox.getChildren().addAll(keyLabel, keyField);
         keyHBox.setSpacing(42);
-        // Visability is toggled based on cipher type
+        // Visibility is toggled based on cipher type
         keyHBox.managedProperty().bind(keyHBox.visibleProperty());
 
-        // Double Encryption Key1 field 
+        // Double encryption field for key1 
         Label key1Label = new Label("Key1: ");
         TextField key1Field = new TextField();
         HBox key1HBox = new HBox();
         key1HBox.getChildren().addAll(key1Label, key1Field);
         key1HBox.setSpacing(32);
-        // Visability is toggled based on cipher type. Invisible by default
+        // Visibility is toggled based on cipher type. Invisible by default
         key1HBox.managedProperty().bind(key1HBox.visibleProperty());
         key1HBox.setVisible(false);
 
-        // Double Encryption Key2 field 
+        // Double encryption field for key2 
         Label key2Label = new Label("Key2: ");
         TextField key2Field = new TextField();
         HBox key2HBox = new HBox();
         key2HBox.getChildren().addAll(key2Label, key2Field);
         key2HBox.setSpacing(32);
-        // Visability is toggled based on cipher type. Invisible by default
+        // Visibility is toggled based on cipher type. Invisible by default
         key2HBox.managedProperty().bind(key2HBox.visibleProperty());
         key2HBox.setVisible(false);
 
@@ -213,7 +213,7 @@ public class CiphersUtility extends Application {
         HBox key1HBoxD = new HBox();
         key1HBoxD.getChildren().addAll(key1LabelD, key1FieldD);
         key1HBoxD.setSpacing(32);
-        // Visability is toggled based on cipher type. Invisible by default
+        // Visibility is toggled based on cipher type. Invisible by default
         key1HBoxD.managedProperty().bind(key1HBoxD.visibleProperty());
         key1HBoxD.setVisible(false);
 
@@ -223,34 +223,34 @@ public class CiphersUtility extends Application {
         HBox key2HBoxD = new HBox();
         key2HBoxD.getChildren().addAll(key2LabelD, key2FieldD);
         key2HBoxD.setSpacing(32);
-        // Visability is toggled based on cipher type. Invisible by default
+        // Visibility is toggled based on cipher type. Invisible by default
         key2HBoxD.managedProperty().bind(key2HBoxD.visibleProperty());
         key2HBoxD.setVisible(false);
 
-        // Checkbox to toggle automatic decryption and list all possibilites
-        CheckBox automaticDecyptOption = new CheckBox("Automatic Decypt");
+        // Checkbox to toggle automatic decryption and list all possibilities
+        CheckBox automaticDecyptOption = new CheckBox("Automatic Decrypt");
         automaticDecyptOption.setSelected(false);
-        CheckBox listAllOption = new CheckBox("List All Decypted");
+        CheckBox listAllOption = new CheckBox("List All Decrypted");
         automaticDecyptOption.setSelected(false);
         listAllOption.setDisable(true);
 
-        // Combobox for number of possibilites to list
+        // Combobox for number of possibilities to list
         Label numOfPossibilitesLabelOne = new Label("List  ");
         ComboBox<Integer> numOfPossibilites = new ComboBox<Integer>();
         numOfPossibilites.getItems().addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                 11, 12, 13, 14, 15);
         numOfPossibilites.setValue(1);
-        Label numOfPossibilitesLabelTwo = new Label("  Possibilites");
+        Label numOfPossibilitesLabelTwo = new Label("  Possibilities");
         HBox possibilitesHBox = new HBox();
         possibilitesHBox.getChildren().addAll(numOfPossibilitesLabelOne,
                 numOfPossibilites,
                 numOfPossibilitesLabelTwo);
 
-        // Add checkboxes and possibilites to VBox
+        // Add checkboxes and possibilities to VBox
         VBox checkboxVBox = new VBox();
         checkboxVBox.getChildren().addAll(automaticDecyptOption, possibilitesHBox, listAllOption);
 
-        // Add listener for the automatic decrption option
+        // Add listener for the automatic decryption option
         automaticDecyptOption.selectedProperty().addListener((observable, oldValue, newValue)
                 -> {
             // Toggle Key Entries and List All Checkbox when checked
