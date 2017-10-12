@@ -5,13 +5,15 @@
  */
 package ciphersutility;
 
+import java.util.Arrays;
+
 public class Alphabet {
     char[] alphabet = new char[26];
     char[] cipherbet = new char[26];
     
     public Alphabet() {
         // Populate alphabet with its 26 letters
-        for (int i = 0, letter = 97; letter < 122; letter++, i++) {
+        for (int i = 0, letter = 97; letter <= 122; letter++, i++) {
             alphabet[i] = (char)letter;
         }
     }
@@ -23,6 +25,7 @@ public class Alphabet {
         }
         System.arraycopy(this.alphabet, n, this.cipherbet, 0, this.alphabet.length-n);
         System.arraycopy(this.alphabet, 0, this.cipherbet, this.alphabet.length-n, n);
+        
     }
     
     public int indexInAlphabet(char c) {
@@ -36,7 +39,7 @@ public class Alphabet {
     
     /* Returns index of the character in the Cigpher Alphabet */
     public int indexInCipherbet(char c) {
-        for (int i = 0; i < this.cipherbet.length; i ++) {
+        for (int i = 0; i < this.cipherbet.length; i++) {
             if (c == (char)this.cipherbet[i]) {
                 return (int)i;
             }
