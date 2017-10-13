@@ -1,7 +1,6 @@
 package ciphersutility;
 
-import java.util.Arrays;
-
+/* Class for representing an alphabet that can be shifted for shift chiphers */
 public class Alphabet {
     char[] alphabet = new char[26]; // Regular (A-Z) alphabet
     char[] cipherbet = new char[26]; // Cipher (Shifted) alphabet

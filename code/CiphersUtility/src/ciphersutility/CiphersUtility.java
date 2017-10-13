@@ -23,10 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- *
- * @author _
- */
+/* GUI class to display and run single and double shift ciphers */
 public class CiphersUtility extends Application {
 
     @Override
@@ -441,6 +438,7 @@ public class CiphersUtility extends Application {
         root.setTop(cipherselectionHBox);
         root.setCenter(tabPane);
         root.setBottom(logConsole);
+        
         // Make tabs fill width
         tabPane.tabMinWidthProperty().bind(root.widthProperty().divide(tabPane.getTabs().size()).subtract(25));
         Scene scene = new Scene(root, 400, 410);
@@ -450,10 +448,12 @@ public class CiphersUtility extends Application {
         primaryStage.show();
     }
 
+    /* Main method to initalize GUI loop */
     public static void main(String[] args) {
         launch(args);
     }
-
+    
+    /* Print results method for printing key, ciphertexts and plaintexts  */
     public static void printResults(String key, String ciphertext, String plaintext) {
         System.out.println("Key: " + key);
         System.out.println("Ciphertext: " + ciphertext.toUpperCase());
@@ -467,6 +467,7 @@ public class CiphersUtility extends Application {
         System.out.println("Plaintext: " + plaintext.toUpperCase());
     }
 
+    /* Redirects System.out.print() to GUI Console */
     public static class Console extends OutputStream {
 
         private TextArea output;

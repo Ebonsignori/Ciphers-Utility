@@ -2,7 +2,7 @@
 
 An application that can encrypt plaintext or decrypt ciphertext using shift ciphers.
 
-![Alt text](./documentation/GUI_v1.0_decrypt.PNG?raw=true "Decryption Example") ![Alt text](./documentation/GUI_v1.0_encrypt.PNG?raw=true "Encryption Example")
+![Alt text](./documentation/GUI_v1.0_decrypt.PNG?raw=true "Decryption Example")   ![Alt text](./documentation/GUI_v1.0_encrypt.PNG?raw=true "Encryption Example")
 	
 Inputs for the program change based on the ciphers used, but each cipher supports the option for both manual or automatic decryption.
 Automatic decryption requires English messages, as decrypted messages are pattern matched against [10000 common English words](https://github.com/first20hours/google-10000-english). 
