@@ -86,19 +86,25 @@ public class ShiftCiphers {
     protected void printXPossibleMatches(int x) {
         System.out.println("--- Possible plaintext(s): --- ");
         // Remove duplicates from possibilities 
-        Set<Occurance> possibilitesSet = new HashSet<>();
+        List<Occurance> duplicatesRemove = new ArrayList<>();
         for (int i = 0; i < plaintextPossibilities.size(); i++) {
-            possibilitesSet.add(plaintextPossibilities.get(i));
+            boolean contains = false;
+            Occurance temp = plaintextPossibilities.get(i);
+            for (int j = 0; j < duplicatesRemove.size(); j++) {
+                if (duplicatesRemove.get(j).toString().equals(temp.toString())) {
+                    contains = true;
+                }  
+            }
+            if (!contains) {
+                duplicatesRemove.add(temp);
+            } 
         } 
-        // Add duplicates removed to new list and sort it
-        List<Occurance> possibilitesList = new ArrayList<>();
-        possibilitesList.addAll(possibilitesSet);
-        Collections.sort(possibilitesList);
-        
+        // Sort duplicate removed list
+        Collections.sort(duplicatesRemove);
         // Print x number of possible plaintexts
-        for (int i = 0; i < possibilitesList.size(); i++) {
-           if (i < 5) {
-               Occurance occ = possibilitesList.get(i);
+        for (int i = 0; i < duplicatesRemove.size(); i++) {
+           if (i < x) {
+               Occurance occ = duplicatesRemove.get(i);
                System.out.println("#" + Integer.toString(i+1) + ": " +
                                   occ.toString() + ", key = " + occ.getKeyStr());
            }
